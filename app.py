@@ -19,7 +19,7 @@ class AskGPTJ(Resource):
         return tokenizer.batch_decode(gen_tokens)[0]
 
 api.add_resource(TestRoute, '/<string:input_str>')
-api.add_resource(AskGPTJ, '/prompt/<string:input_str>')
+api.add_resource(AskGPTJ, '/prompt/<string:prompt>')
 
 if __name__ == '__main__':
     app.run(debug=True)

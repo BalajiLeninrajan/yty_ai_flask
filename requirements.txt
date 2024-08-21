@@ -2,3 +2,5 @@ flask
 flask-restful
 transformers
 torch
+pandas
+datasets
