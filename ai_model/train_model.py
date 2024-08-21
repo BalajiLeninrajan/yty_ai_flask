@@ -2,10 +2,10 @@ from datasets import Dataset
 import transformers
 from fetch_data import *
 
-START_DATE = "2020-01-01"
-END_DATE = "2024-08-19"
+START_DATE: str = "2020-01-01"
+END_DATE: str = "2024-08-19"
 
-dates = pd.date_range(START_DATE, END_DATE)
+dates: pd.DatetimeIndex = pd.date_range(START_DATE, END_DATE)
 
 pi_data: list[str] = preprocess_data(fetch_pi_raw_data(dates))
 insp_data: list[str] = preprocess_data(fetch_insp_raw_data(dates))
@@ -17,10 +17,10 @@ dataset: Dataset = Dataset.from_dict({
 
 tokenizer: transformers.GPT2TokenizerFast = transformers.AutoTokenizer.from_pretrained("EleutherAI/gpt-j-6B")
 
-def tokenize_function(data: dict[str, list[str]]):
+def tokenize_function(data: dict[str, list[str]]) -> transformers.BatchEncoding:
     return tokenizer(data["text"],  padding="max_length", truncation=True, max_length=512)
 
-tokenized_dataset = dataset.map(tokenize_function, batched=True)
+tokenized_dataset: Dataset = dataset.map(tokenize_function, batched=True)
 
 data_collator: transformers.DataCollatorForLanguageModeling = transformers.DataCollatorForLanguageModeling(
     tokenizer=tokenizer,
