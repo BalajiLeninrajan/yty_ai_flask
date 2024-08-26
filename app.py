@@ -24,9 +24,9 @@ def generate():
         if not prompt:
             return jsonify({"error": "No prompt provided"}), 400
 
-        inputs = tokenizer(prompt, return_tensors="pt")
-        output = fine_tuned_model.generate(**inputs, max_length=100)
-        result = tokenizer.decode(output[0], skip_special_tokens=True)
+        inputs = tokenizer(prompt, return_tensors="pt").input_ids
+        output = fine_tuned_model.generate(inputs, max_length=100)
+        result = tokenizer.batch_decode(output)[0]
         return jsonify({"result": result})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -40,9 +40,9 @@ def generateNoFineTune():
         if not prompt:
             return jsonify({"error": "No prompt provided"}), 400
 
-        inputs = tokenizer(prompt, return_tensors="pt")
-        output = model.generate(**inputs, max_length=100)
-        result = tokenizer.decode(output[0], skip_special_tokens=True)
+        inputs = tokenizer(prompt, return_tensors="pt").input_ids
+        output = model.generate(inputs, max_length=100)
+        result = tokenizer.batch_decode(output)[0]
         return jsonify({"result": result})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
