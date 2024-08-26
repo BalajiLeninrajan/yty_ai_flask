@@ -1,25 +1,51 @@
-from flask import Flask
-from flask_restful import Resource, Api
-from transformers import AutoTokenizer,GPTJForCausalLM
+from flask import Flask, request, jsonify
+from transformers import AutoTokenizer, GPTJForCausalLM, AutoModelForCausalLM
 import torch
 
 app: Flask = Flask(__name__)
-api: Api = Api(app)
+
 model = GPTJForCausalLM.from_pretrained("EleutherAI/gpt-j-6B", revision="float16", torch_dtype=torch.float16, low_cpu_mem_usage=True)
 tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-j-6B")
 
-class TestRoute(Resource):
-    def get(self, input_str: str) -> dict[str, str]:
-        return {'Hello': input_str}
+fine_tuned_model = AutoModelForCausalLM.from_pretrained("./gpt-j-finetuned")
+fine_tuned_tokenizer = AutoTokenizer.from_pretrained("./gpt-j-finetuned")
 
-class AskGPTJ(Resource):
-    def get(self, prompt: str) -> str:
-        input_ids = tokenizer(prompt, return_tensors="pt").input_ids
-        gen_tokens = model.generate(input_ids)
-        return tokenizer.batch_decode(gen_tokens)[0]
 
-api.add_resource(TestRoute, '/<string:input_str>')
-api.add_resource(AskGPTJ, '/prompt/<string:prompt>')
+@app.errorhandler(404)
+def page_not_found(e):
+    return jsonify({"error": "Route not found"}), 404
+
+
+@app.route('/', methods=['POST'])
+def generate():
+    try:
+        data = request.get_json()
+        prompt = data.get('prompt', '')
+        if not prompt:
+            return jsonify({"error": "No prompt provided"}), 400
+
+        inputs = fine_tuned_tokenizer(prompt, return_tensors="pt")
+        output = fine_tuned_model.generate(**inputs, max_length=100)
+        result = fine_tuned_tokenizer.decode(output[0], skip_special_tokens=True)
+        return jsonify({"result": result})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/noFineTune', methods=['POST'])
+def generateNoFineTune():
+    try:
+        data = request.get_json()
+        prompt = data.get('prompt', '')
+        if not prompt:
+            return jsonify({"error": "No prompt provided"}), 400
+
+        inputs = tokenizer(prompt, return_tensors="pt")
+        output = model.generate(**inputs, max_length=100)
+        result = tokenizer.decode(output[0], skip_special_tokens=True)
+        return jsonify({"result": result})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8086, debug=True)

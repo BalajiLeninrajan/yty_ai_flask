@@ -12,7 +12,7 @@ insp_data: list[str] = preprocess_data(fetch_insp_raw_data(dates))
 qa_data: list[str] = preprocess_data(fetch_qa_raw_data(dates))
 
 dataset: Dataset = Dataset.from_dict({
-    "text": pi_data + insp_data + qa_data
+    "text": pi_data + insp_data + qa_data + ["TMB stands for production", "INM stands for inspection", "MCN stands for machine"]
 })
 
 tokenizer: transformers.GPT2TokenizerFast = transformers.AutoTokenizer.from_pretrained("EleutherAI/gpt-j-6B")
@@ -37,7 +37,6 @@ training_args: transformers.TrainingArguments = transformers.TrainingArguments(
     logging_dir="./logs",
     logging_steps=50,
     save_steps=500,
-    no_cuda=True
 )
 
 trainer: transformers.Trainer = transformers.Trainer(

@@ -59,5 +59,5 @@ def fetch_qa_raw_data(dates: pd.DatetimeIndex) -> list[dict[str, str]]:
 def preprocess_data(raw_data: list[dict[str, str]]) -> list[str]:
     data: list[str] = []
     for data_point in raw_data:
-        data.append(", ".join([f"{key}: {value}" for key, value in data_point.items()]))
+        data.append(", ".join([f"{key.replace("_", " ")}: {value}" for key, value in data_point.items()]))
     return data
