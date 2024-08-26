@@ -8,4 +8,4 @@ response = requests.post(
     }
 )
 
-print(response)
+print(response.json())
