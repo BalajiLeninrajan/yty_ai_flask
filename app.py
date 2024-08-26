@@ -8,8 +8,8 @@ model = GPTJForCausalLM.from_pretrained("EleutherAI/gpt-j-6B", revision="float16
 tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-j-6B")
 tokenizer.pad_token = tokenizer.eos_token
 
-fine_tuned_model = AutoModelForCausalLM.from_pretrained("./gpt-j-finetuned")
-fine_tuned_tokenizer = AutoTokenizer.from_pretrained("./gpt-j-finetuned")
+fine_tuned_model = AutoModelForCausalLM.from_pretrained("./ai_model/gpt-j-finetuned")
+fine_tuned_tokenizer = AutoTokenizer.from_pretrained("./ai_model/gpt-j-finetuned")
 fine_tuned_tokenizer.pad_token = fine_tuned_tokenizer.eos_token
 
 
