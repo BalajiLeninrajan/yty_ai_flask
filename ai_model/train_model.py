@@ -16,6 +16,7 @@ dataset: Dataset = Dataset.from_dict({
 })
 
 tokenizer: transformers.GPT2TokenizerFast = transformers.AutoTokenizer.from_pretrained("EleutherAI/gpt-j-6B")
+tokenizer.pad_token = tokenizer.eos_token
 
 def tokenize_function(data: dict[str, list[str]]) -> transformers.BatchEncoding:
     return tokenizer(data["text"],  padding="max_length", truncation=True, max_length=512)
