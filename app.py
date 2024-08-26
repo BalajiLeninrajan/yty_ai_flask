@@ -9,8 +9,6 @@ tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-j-6B")
 tokenizer.pad_token = tokenizer.eos_token
 
 fine_tuned_model = AutoModelForCausalLM.from_pretrained("./ai_model/gpt-j-finetuned")
-fine_tuned_tokenizer = AutoTokenizer.from_pretrained("./ai_model/gpt-j-finetuned")
-fine_tuned_tokenizer.pad_token = fine_tuned_tokenizer.eos_token
 
 
 @app.errorhandler(404)
@@ -26,9 +24,9 @@ def generate():
         if not prompt:
             return jsonify({"error": "No prompt provided"}), 400
 
-        inputs = fine_tuned_tokenizer(prompt, return_tensors="pt")
+        inputs = tokenizer(prompt, return_tensors="pt")
         output = fine_tuned_model.generate(**inputs, max_length=100)
-        result = fine_tuned_tokenizer.decode(output[0], skip_special_tokens=True)
+        result = tokenizer.decode(output[0], skip_special_tokens=True)
         return jsonify({"result": result})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
